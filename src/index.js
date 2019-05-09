@@ -1,12 +1,112 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom'
 import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import TodoItem from './components/TodoItem.js';
+import TodoForm from './components/TodoForm.js';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+class TodoList extends React.Component {
+  constructor(){
+    super();
+    this.changeStatus = this.changeStatus.bind(this);
+    this.updateTask = this.updateTask.bind(this);
+    this.addTask = this.addTask.bind(this);
+    this.deleteTask = this.deleteTask.bind(this);
+    this.editTask = this.editTask.bind(this);
+    this.state = {
+      tasks:[{
+        name:"Buy Milk",
+        completed:false
+      },
+      {
+        name:"Buy Cheese",
+        completed:false
+      },
+      {
+        name:"Buy Bread",
+        completed:false
+      }],
+      currentTask:'' 
+    }
+ }
+deleteTask(index){
+  console.log(index)
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+  let tasks = this.state.tasks;
+  tasks.splice(index,1);
+
+  this.setState({
+    tasks
+  })
+  
+}
+addTask(evt){
+  evt.preventDefault();
+  let tasks = this.state.tasks;
+  let currentTask = this.state.currentTask;
+  tasks.push({
+    name:currentTask,
+    completed:false
+  })
+
+  this.setState({
+    tasks,
+    currentTask:'' 
+  })
+
+
+}
+updateTask(newValue){
+  this.setState({
+    currentTask:newValue.target.value
+  })
+}
+
+editTask(index, newValue){
+ var tasks = this.state.tasks;
+ var task = tasks[index];
+ task['name'] = newValue;
+ this.setState({
+  tasks
+ })
+}
+
+
+changeStatus(index){
+ var tasks = this.state.tasks;
+ var task = tasks[index];
+ task.completed = !task.completed;
+ this.setState({
+   tasks:tasks
+ })
+}
+ render() {
+    return (
+      <section>
+       <TodoForm 
+            currentTask={this.state.currentTask}
+            updateTask={this.updateTask}
+            addTask={this.addTask}
+        />
+        <ul>
+        {
+          this.state.tasks.map((task, index) => {
+            return <TodoItem 
+                    key={index} 
+                    clickHandler={this.changeStatus} 
+                    index={index} 
+                    deleteTask={this.deleteTask}
+                    editTask={this.editTask}
+                    details={task}
+                     />
+          })
+        }
+          
+        </ul>
+      </section>
+    )
+  }
+}
+
+
+
+ReactDOM.render(<TodoList />,document.getElementById('root'))
